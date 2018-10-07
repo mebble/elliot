@@ -1,0 +1,27 @@
+{
+  "name": "elliot",
+  "version": "0.1.0",
+  "description": "A real-time collaborative text editor",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev:client": "parcel watch client/index.html",
+    "build": "parcel build client/index.html",
+    "postbuild": "rm dist/*.map",
+    "dev:server": "nodemon server/server.js"
+  },
+  "author": "Neil Leeson Syiemlieh",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.18.4",
+    "parcel-bundler": "^1.10.1"
+  },
+  "dependencies": {
+    "antd": "^3.10.0",
+    "codemirror": "^5.40.2",
+    "express": "^4.16.3",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "socket.io": "^2.1.1"
+  }
+}
