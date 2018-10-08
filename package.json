@@ -17,11 +17,13 @@
     "parcel-bundler": "^1.10.1"
   },
   "dependencies": {
+    "@skidding/react-codemirror": "^1.0.2",
     "antd": "^3.10.0",
-    "codemirror": "^5.40.2",
     "express": "^4.16.3",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
+    "react": ">=15.5 <17",
+    "react-codemirror": "skidding/react-codemirror",
+    "react-dom": ">=15.5 <17",
+    "react-split-pane": "^0.1.84",
     "socket.io": "^2.1.1"
   }
 }

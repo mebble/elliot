@@ -1,0 +1,8 @@
+.Resizer {
+    width: 5px;
+    background: #aaa;
+}
+
+.Resizer:hover {
+    cursor: col-resize;
+}
