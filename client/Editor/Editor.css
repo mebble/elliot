@@ -1,0 +1,4 @@
+/* Override Codemirror */
+.CodeMirror {
+  height: 100%;
+}

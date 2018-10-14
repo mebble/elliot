@@ -4,6 +4,8 @@ import CodeMirror from '@skidding/react-codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 
+import './Editor.css';
+
 class Editor extends Component {
     constructor(props) {
         super(props);
@@ -17,7 +19,9 @@ class Editor extends Component {
         const { content } = this.state;
         const cmOptions = {
             mode: this.state.mode,
-            readOnly: this.props.readOnly
+            readOnly: this.props.readOnly,
+            lineNumbers: true,
+            height: '100%'
         };
 
         return (

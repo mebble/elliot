@@ -3,7 +3,7 @@ import SplitPane from 'react-split-pane';
 
 import './App.css';
 
-import Editor from './Editor';
+import Editor from './Editor/Editor';
 
 class App extends Component {
     constructor(props) {
