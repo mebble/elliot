@@ -3,12 +3,23 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
+const State = require('./state');
+const state = new State();
+
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static('dist'));
 
 io.on('connection', (socket) => {
-
+    socket.on('join-room', (data, ack) => {
+        state.joinRoom(socket, data, ack);
+    });
+    socket.on('editor-update', (data, ack) => {
+        state.editorUpdate(socket, data, ack);
+    });
+    socket.on('disconnect', (data) => {
+        state.disconnect(socket, data);
+    });
 });
 
 server.listen(PORT, () => {
