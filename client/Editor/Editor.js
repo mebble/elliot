@@ -10,26 +10,22 @@ class Editor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            content: props.content,
             mode: 'javascript'
-        }
+        };
     }
 
     render() {
-        const { content } = this.state;
         const cmOptions = {
             mode: this.state.mode,
-            readOnly: this.props.readOnly,
-            lineNumbers: true,
-            height: '100%'
+            lineNumbers: true
         };
 
         return (
             <div className="Editor">
                 <CodeMirror
-                    value={content}
+                    value={this.props.initContent}
                     options={cmOptions}
-                    height="100%"
+                    onChange={this.props.onChange}
                 />
             </div>
         );
