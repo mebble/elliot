@@ -11,7 +11,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            displays: []
+            peers: []
         };
         this.socket = io();
         this.initSocketListeners();
@@ -21,7 +21,14 @@ class App extends Component {
 
     initSocketListeners() {
         this.socket.on('roomie-join', (data) => {
-
+            const newPeer = {
+                socketId: data.socketId,
+                initContent: 'New peer',
+                mode: 'javascript'
+            };
+            this.setState({
+                peers: [...this.state.peers, newPeer]
+            });
         });
         this.socket.on('roomie-editor', (data) => {
 
@@ -41,11 +48,17 @@ class App extends Component {
     }
 
     render() {
+        const { peers } = this.state;
+        console.log(peers)
         return (
             <div className="App">
-                <SplitPane split="vertical" defaultSize="50%">
+                <SplitPane split="vertical" defaultSize="50%" >
                     <Editor initContent="// Your code goes here..." onChange={this.myEditorChange} />
-                    <Display initContent="// Your friend's code shows up here..." mode="javascript" />
+                    {peers.length
+                        ? peers.map(d => <Display key={d.socketid} {...d} />)
+                        : <Display initContent="Nobody here..." />
+                    }
+                    {/* Only one peer display appears */}
                 </SplitPane>
             </div>
         );
