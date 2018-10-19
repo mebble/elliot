@@ -18,8 +18,16 @@ class App extends Component {
     }
 
     setRoom(roomName) {
-        this.setState({
-            room: roomName
+        this.socket.emit('join-room', {
+            roomName: roomName
+        }, (err, res) => {
+            if (err) {
+                console.log(err.message);
+                return;
+            }
+            this.setState({
+                room: roomName
+            });
         });
     }
 

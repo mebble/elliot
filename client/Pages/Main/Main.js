@@ -31,7 +31,12 @@ class Main extends Component {
             });
         });
         this.socket.on('roomie-editor', (data) => {
-
+            const updatedPeers = this.state.peers.map(p => {
+                return p.socketId === data.socketId ? { ...p, content: data.content } : p;
+            })
+            this.setState({
+                peers: updatedPeers
+            });
         });
         this.socket.on('roomie-leave', (data) => {
 
@@ -42,8 +47,12 @@ class Main extends Component {
         // !! use the change object
         this.socket.emit('editor-update', {
             content: newContent
-        }, (ack) => {
-            console.log(ack);
+        }, (err, res) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            console.log(res);
         });
     }
 
@@ -54,10 +63,10 @@ class Main extends Component {
                 <SplitPane split="vertical" defaultSize="50%" >
                     <Editor initContent="// Your code goes here..." onChange={this.myEditorChange} />
                     {peers.length
-                        ? peers.map(d => <Display key={d.socketid} {...d} />)
+                        ? peers.map(p => <Display key={p.socketId} {...p} />)
                         : <Display initContent="Nobody here..." />
                     }
-                    {/* Only one peer display appears */}
+                    {/* Bug - Only one peer display appears */}
                 </SplitPane>
             </div>
         );

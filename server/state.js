@@ -16,7 +16,7 @@ class State {
             if (roomies.length < MAX_ROOMIES) {
                 roomies.push(socket);
             } else {
-                ack({ status: 'FAIL', message: 'Room full!' });
+                ack({ message: 'Room full!' });
                 return;
             }
         } else {
@@ -27,8 +27,7 @@ class State {
         socket.roomName = data.roomName;
         console.log(`Joined room ${socket.roomName}`);
         console.log(`${Object.keys(this.rooms).length} rooms present`);
-        ack({
-            status: 'SUCCESS',
+        ack(null, {
             message: 'Joined room!',
             mySocketId: socket.id,
             roomies: roomies ? roomies.filter(s => s.id !== socket.id).map(s => s.id) : null
@@ -46,7 +45,7 @@ class State {
                 content: data.content,
                 socketId: socket.id
             });
-        ack({ status: 'SUCCESS', message: 'Editor update received!' });
+        ack(null, { message: 'Editor update received!' });
     }
 
     disconnect(socket, data) {
