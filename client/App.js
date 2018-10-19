@@ -1,65 +1,36 @@
 import React, { Component } from 'react';
-import SplitPane from 'react-split-pane';
 import io from 'socket.io-client';
 
-import './App.css';
+import Login from './Pages/Login/Login';
+import Main from './Pages/Main/Main';
 
-import Editor from './Editor/Editor';
-import Display from './Display/Display';
+import './App.css';
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            peers: []
+            room: null
         };
         this.socket = io();
-        this.initSocketListeners();
 
-        this.myEditorChange = this.myEditorChange.bind(this);
+        this.setRoom = this.setRoom.bind(this);
     }
 
-    initSocketListeners() {
-        this.socket.on('roomie-join', (data) => {
-            const newPeer = {
-                socketId: data.socketId,
-                initContent: 'New peer',
-                mode: 'javascript'
-            };
-            this.setState({
-                peers: [...this.state.peers, newPeer]
-            });
-        });
-        this.socket.on('roomie-editor', (data) => {
-
-        });
-        this.socket.on('roomie-leave', (data) => {
-
-        });
-    }
-
-    myEditorChange(newContent, changeObject) {
-        // !! use the change object
-        this.socket.emit('editor-update', {
-            content: newContent
-        }, (ack) => {
-            console.log(ack);
+    setRoom(roomName) {
+        this.setState({
+            room: roomName
         });
     }
 
     render() {
-        const { peers } = this.state;
-        console.log(peers)
+        const { room } = this.state;
         return (
             <div className="App">
-                <SplitPane split="vertical" defaultSize="50%" >
-                    <Editor initContent="// Your code goes here..." onChange={this.myEditorChange} />
-                    {peers.length
-                        ? peers.map(d => <Display key={d.socketid} {...d} />)
-                        : <Display initContent="Nobody here..." />
-                    }
-                    {/* Only one peer display appears */}
-                </SplitPane>
+                {room
+                    ? <Main room={room} socket={this.socket} onNewRoom={this.setRoom} />
+                    : <Login onRoom={this.setRoom} />
+                }
             </div>
         );
     }
