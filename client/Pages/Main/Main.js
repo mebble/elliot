@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import SplitPane from 'react-split-pane';
 
 import Editor from '../../Editor/Editor';
-import Display from '../../Display/Display';
 
 import './Main.css';
 
@@ -90,8 +89,8 @@ class Main extends Component {
                 <SplitPane split="vertical" defaultSize="50%" >
                     <Editor {...me} onChange={this.myEditorChange} />
                     {peers.length
-                        ? peers.map(p => <Display key={p.socketId} {...p} />)
-                        : <Display initContent="Nobody here..." />
+                        ? peers.map(p => <Editor {...p} key={p.socketId} readOnly="nocursor" />)
+                        : <Editor content="Nobody here..." readOnly="nocursor" />
                     }
                     {/* Bug - Only one peer display appears */}
                 </SplitPane>
