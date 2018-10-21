@@ -22,11 +22,11 @@ class Main extends Component {
 
     initSocketListeners() {
         this.socket.on('join-room', (peer) => {
-            if (peer.roomName != this.room) throw new Error('An outsider is here!');
+            if (peer.room != this.room) throw new Error('An outsider is here!');
 
             this.socket.emit('introduction', {
                 socketId: peer.socketId,
-                roomName: this.room,
+                room: this.room,
                 ...this.state.me
             }, (err, res) => {
                 if (err) return console.error(err);
@@ -41,7 +41,7 @@ class Main extends Component {
             });
         });
         this.socket.on('introduction', (peer) => {
-            if (peer.roomName != this.room) throw new Error('I joined the wrong room!');
+            if (peer.room != this.room) throw new Error('I joined the wrong room!');
             this.setState({
                 peers: [...this.state.peers, {
                     socketId: peer.socketId,

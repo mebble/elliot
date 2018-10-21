@@ -21,9 +21,9 @@ class App extends Component {
         this.setRoom = this.setRoom.bind(this);
     }
 
-    setRoom(roomName) {
+    setRoom(room) {
         this.socket.emit('join-room', {
-            roomName: roomName,
+            room: room,
             ...this.init
         }, (err, res) => {
             if (err) {
@@ -32,7 +32,7 @@ class App extends Component {
             }
             console.log(res);
             this.setState({
-                room: res.roomName
+                room: res.room
             });
         });
     }
