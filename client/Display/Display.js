@@ -11,7 +11,7 @@ const Display = (props) => {
     return (
         <div className="Display">
             <CodeMirror
-                value={props.initContent}
+                value={props.content}
                 options={cmOptions}
             />
         </div>

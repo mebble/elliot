@@ -14,6 +14,9 @@ io.on('connection', (socket) => {
     socket.on('join-room', (data, ack) => {
         state.joinRoom(socket, data, ack);
     });
+    socket.on('introduction', (data, ack) => {
+        state.introduction(socket, data, ack);
+    });
     socket.on('editor-update', (data, ack) => {
         state.editorUpdate(socket, data, ack);
     });

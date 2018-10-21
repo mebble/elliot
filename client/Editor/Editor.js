@@ -23,7 +23,7 @@ class Editor extends Component {
         return (
             <div className="Editor">
                 <CodeMirror
-                    value={this.props.initContent}
+                    value={this.props.content}
                     options={cmOptions}
                     onChange={this.props.onChange}
                 />

@@ -10,6 +10,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            me: { ...props.init },
             peers: []
         };
         this.socket = props.socket;
@@ -20,14 +21,34 @@ class Main extends Component {
     }
 
     initSocketListeners() {
-        this.socket.on('roomie-join', (data) => {
-            const newPeer = {
-                socketId: data.socketId,
-                initContent: 'New peer',
-                mode: 'javascript'
-            };
+        this.socket.on('roomie-join', (peer) => {
+            if (peer.roomName != this.room) throw new Error('An outsider is here!');
+
+            this.socket.emit('introduction', {
+                socketId: peer.socketId,
+                roomName: this.room,
+                ...this.state.me
+            }, (err, res) => {
+                if (err) return console.error(err);
+
+                this.setState({
+                    peers: [...this.state.peers, {
+                        socketId: peer.socketId,
+                        content: peer.content,
+                        mode: peer.mode
+                    }]
+                });
+            });
+        });
+        this.socket.on('roomie-introduce', (peer) => {
+            if (peer.roomName != this.room) throw new Error('I joined the wrong room!');
             this.setState({
-                peers: [...this.state.peers, newPeer]
+                peers: [...this.state.peers, {
+                    socketId: peer.socketId,
+                    content: peer.content,
+                    mode: peer.mode
+
+                }]
             });
         });
         this.socket.on('roomie-editor', (data) => {
@@ -57,11 +78,11 @@ class Main extends Component {
     }
 
     render() {
-        const { peers } = this.state;
+        const { me, peers } = this.state;
         return (
             <div className="Main">
                 <SplitPane split="vertical" defaultSize="50%" >
-                    <Editor initContent="// Your code goes here..." onChange={this.myEditorChange} />
+                    <Editor content={me.content} onChange={this.myEditorChange} />
                     {peers.length
                         ? peers.map(p => <Display key={p.socketId} {...p} />)
                         : <Display initContent="Nobody here..." />

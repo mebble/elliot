@@ -12,6 +12,10 @@ class App extends Component {
         this.state = {
             room: null
         };
+        this.init = {
+            content: '// Hey there!',
+            mode: 'javascript'
+        };
         this.socket = io();
 
         this.setRoom = this.setRoom.bind(this);
@@ -19,14 +23,16 @@ class App extends Component {
 
     setRoom(roomName) {
         this.socket.emit('join-room', {
-            roomName: roomName
+            roomName: roomName,
+            ...this.init
         }, (err, res) => {
             if (err) {
                 console.log(err.message);
                 return;
             }
+            console.log(res);
             this.setState({
-                room: roomName
+                room: res.roomName
             });
         });
     }
@@ -36,7 +42,7 @@ class App extends Component {
         return (
             <div className="App">
                 {room
-                    ? <Main room={room} socket={this.socket} onNewRoom={this.setRoom} />
+                    ? <Main init={this.init} room={room} socket={this.socket} onNewRoom={this.setRoom} />
                     : <Login onRoom={this.setRoom} />
                 }
             </div>

@@ -29,14 +29,31 @@ class State {
         console.log(`${Object.keys(this.rooms).length} rooms present`);
         ack(null, {
             message: 'Joined room!',
+            roomName: data.roomName,
             mySocketId: socket.id,
-            roomies: roomies ? roomies.filter(s => s.id !== socket.id).map(s => s.id) : null
+            roomies: roomies ? roomies.filter(s => s.id !== socket.id).map(s => s.id) : []  // could use to verify if all roomies have introduced themselves
         });
         socket.to(socket.roomName)
             .emit('roomie-join', {
                 message: 'New roomie!',
-                socketId: socket.id
+                socketId: socket.id,
+                roomName: data.roomName,
+                content: data.content,
+                mode: data.mode
             });
+    }
+
+    introduction(socket, data, ack) {
+        socket.to(data.socketId)
+            .emit('roomie-introduce', {
+                socketId: socket.id,
+                roomName: data.roomName,
+                content: data.content,
+                mode: data.mode
+            });
+        ack(null, {
+            message: 'Introduction success!'
+        });
     }
 
     editorUpdate(socket, data, ack) {
