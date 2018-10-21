@@ -11,6 +11,9 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static('dist'));
 
 io.on('connection', (socket) => {
+    state.connections.push(socket);
+    console.log(`Connected: ${state.connections.length} socket connected`);
+
     socket.on('join-room', (data, ack) => {
         state.joinRoom(socket, data, ack);
     });
