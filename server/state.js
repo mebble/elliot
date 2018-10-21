@@ -1,9 +1,9 @@
-const MAX_ROOMIES = 2;
+const MAX_PEERS = 2;
 
 class State {
     constructor() {
         this.connections = [];  // Socket[]: all connections
-        this.rooms = {};  // Map<String, Socket[]>: room name and sockets in that room
+        this.rooms = {};  // Map<String, Socket[]>: room name and sockets in that room (peers)
     }
 
     joinRoom(socket, data, ack) {
@@ -11,10 +11,10 @@ class State {
             this._leaveRoom(socket);
         }
 
-        const roomies = this.rooms[data.room];
-        if (roomies) {
-            if (roomies.length < MAX_ROOMIES) {
-                roomies.push(socket);
+        const peers = this.rooms[data.room];
+        if (peers) {
+            if (peers.length < MAX_PEERS) {
+                peers.push(socket);
             } else {
                 ack({ message: 'Room full!' });
                 return;
@@ -30,8 +30,7 @@ class State {
         ack(null, {
             message: 'Joined room!',
             room: socket.room,
-            mySocketId: socket.id,
-            roomies: roomies ? roomies.filter(s => s.id !== socket.id).map(s => s.id) : []  // could use to verify if all roomies have introduced themselves
+            peers: peers ? peers.filter(s => s.id !== socket.id).map(s => s.id) : []  // could use to verify if all peers have introduced themselves
         });
         socket.to(socket.room)
             .emit('join-room', {
@@ -44,7 +43,7 @@ class State {
     }
 
     introduction(socket, data, ack) {
-        socket.to(data.socketId)
+        socket.to(data.to)
             .emit('introduction', {
                 socketId: socket.id,
                 room: data.room,
@@ -81,11 +80,11 @@ class State {
             })
             .leave(socket.room);
 
-        const roomies = this.rooms[socket.room];
-        roomies.splice(roomies.indexOf(socket), 1);
+        const peers = this.rooms[socket.room];
+        peers.splice(peers.indexOf(socket), 1);
         console.log(`Left room ${socket.room}`);
 
-        if (roomies.length === 0) {
+        if (peers.length === 0) {
             this._removeRoom(socket.room);
         }
     }

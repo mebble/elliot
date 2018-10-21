@@ -25,7 +25,7 @@ class Main extends Component {
             if (peer.room != this.room) throw new Error('An outsider is here!');
 
             this.socket.emit('introduction', {
-                socketId: peer.socketId,
+                to: peer.socketId,
                 room: this.room,
                 ...this.state.me
             }, (err, res) => {
