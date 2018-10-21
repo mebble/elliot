@@ -60,7 +60,12 @@ class Main extends Component {
             });
         });
         this.socket.on('roomie-leave', (data) => {
-
+            this.setState(state => {
+                const updatedPeers = state.peers.filter(p => p.socketId !== data.socketId);
+                return {
+                    peers: updatedPeers
+                };
+            });
         });
     }
 
