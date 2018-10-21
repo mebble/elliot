@@ -10,21 +10,22 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            room: null
-        };
-        this.init = {
-            content: '// Hey there!',
-            mode: 'javascript'
+            room: null,
+            editor: {
+                content: '// Hey there!',
+                mode: 'javascript'
+            }
         };
         this.socket = io();
 
         this.setRoom = this.setRoom.bind(this);
+        this.myEditorChange = this.myEditorChange.bind(this);
     }
 
     setRoom(room) {
         this.socket.emit('join-room', {
             room: room,
-            ...this.init
+            ...this.state.editor
         }, (err, res) => {
             if (err) {
                 console.log(err.message);
@@ -37,12 +38,31 @@ class App extends Component {
         });
     }
 
+    myEditorChange(newContent, changeObject) {
+        // !! use the change object
+        this.setState(state => {
+            return {
+                editor: { ...state.editor, content: newContent }
+            };
+        }, () => {
+            this.socket.emit('editor-update', {
+                content: newContent
+            }, (err, res) => {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log(res);
+            });
+        });
+    }
+
     render() {
-        const { room } = this.state;
+        const { room, editor } = this.state;
         return (
             <div className="App">
                 {room
-                    ? <Main init={this.init} room={room} socket={this.socket} onNewRoom={this.setRoom} />
+                    ? <Main editor={editor} room={room} socket={this.socket} onNewRoom={this.setRoom} onEditorChange={this.myEditorChange} />
                     : <Login onRoom={this.setRoom} />
                 }
             </div>

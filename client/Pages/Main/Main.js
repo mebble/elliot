@@ -9,24 +9,23 @@ class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            me: { ...props.init },
             peers: []
         };
         this.socket = props.socket;
-        this.room = props.room;
-        this.initSocketListeners();
 
-        this.myEditorChange = this.myEditorChange.bind(this);
+        this.initSocketListeners = this.initSocketListeners.bind(this);
+
+        this.initSocketListeners();
     }
 
     initSocketListeners() {
         this.socket.on('join-room', (peer) => {
-            if (peer.room != this.room) throw new Error('An outsider is here!');
+            if (peer.room != this.props.room) throw new Error('An outsider is here!');
 
             this.socket.emit('introduction', {
                 to: peer.socketId,
-                room: this.room,
-                ...this.state.me
+                room: this.props.room,
+                ...this.props.editor
             }, (err, res) => {
                 if (err) return console.error(err);
 
@@ -42,7 +41,7 @@ class Main extends Component {
             });
         });
         this.socket.on('introduction', (peer) => {
-            if (peer.room != this.room) throw new Error('I joined the wrong room!');
+            if (peer.room != this.props.room) throw new Error('I joined the wrong room!');
 
             this.setState(state => {
                 return {
@@ -74,31 +73,13 @@ class Main extends Component {
         });
     }
 
-    myEditorChange(newContent, changeObject) {
-        // !! use the change object
-        this.setState(state => {
-            return {
-                me: { ...state.me, content: newContent }
-            };
-        }, () => {
-            this.socket.emit('editor-update', {
-                content: newContent
-            }, (err, res) => {
-                if (err) {
-                    console.log(err);
-                    return;
-                }
-                console.log(res);
-            });
-        });
-    }
-
     render() {
-        const { me, peers } = this.state;
+        const { peers } = this.state;
+        const { editor, onEditorChange } = this.props;
         return (
             <div className="Main">
                 <SplitPane split="vertical" defaultSize="50%" >
-                    <Editor {...me} onChange={this.myEditorChange} />
+                    <Editor {...editor} onChange={onEditorChange} />
                     {peers.length
                         ? peers.map(p => <Editor {...p} key={p.socketId} readOnly="nocursor" />)
                         : <Editor content="Nobody here..." readOnly="nocursor" />
