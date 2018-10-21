@@ -30,32 +30,38 @@ class Main extends Component {
             }, (err, res) => {
                 if (err) return console.error(err);
 
-                this.setState({
-                    peers: [...this.state.peers, {
-                        socketId: peer.socketId,
-                        content: peer.content,
-                        mode: peer.mode
-                    }]
+                this.setState(state => {
+                    return {
+                        peers: [...state.peers, {
+                            socketId: peer.socketId,
+                            content: peer.content,
+                            mode: peer.mode
+                        }]
+                    };
                 });
             });
         });
         this.socket.on('introduction', (peer) => {
             if (peer.room != this.room) throw new Error('I joined the wrong room!');
-            this.setState({
-                peers: [...this.state.peers, {
-                    socketId: peer.socketId,
-                    content: peer.content,
-                    mode: peer.mode
 
-                }]
+            this.setState(state => {
+                return {
+                    peers: [...state.peers, {
+                        socketId: peer.socketId,
+                        content: peer.content,
+                        mode: peer.mode
+                    }]
+                };
             });
         });
         this.socket.on('editor-update', (data) => {
-            const updatedPeers = this.state.peers.map(p => {
-                return p.socketId === data.socketId ? { ...p, content: data.content } : p;
-            })
-            this.setState({
-                peers: updatedPeers
+            this.setState(state => {
+                const updatedPeers = state.peers.map(p => {
+                    return p.socketId === data.socketId ? { ...p, content: data.content } : p;
+                });
+                return {
+                    peers: updatedPeers
+                };
             });
         });
         this.socket.on('leave-room', (data) => {
