@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import SplitPane from 'react-split-pane';
 
 import Editor from '../../Editor/Editor';
-import Display from '../../Display/Display';
 
 import './Main.css';
 
@@ -21,45 +20,51 @@ class Main extends Component {
     }
 
     initSocketListeners() {
-        this.socket.on('roomie-join', (peer) => {
-            if (peer.roomName != this.room) throw new Error('An outsider is here!');
+        this.socket.on('join-room', (peer) => {
+            if (peer.room != this.room) throw new Error('An outsider is here!');
 
             this.socket.emit('introduction', {
-                socketId: peer.socketId,
-                roomName: this.room,
+                to: peer.socketId,
+                room: this.room,
                 ...this.state.me
             }, (err, res) => {
                 if (err) return console.error(err);
 
-                this.setState({
-                    peers: [...this.state.peers, {
+                this.setState(state => {
+                    return {
+                        peers: [...state.peers, {
+                            socketId: peer.socketId,
+                            content: peer.content,
+                            mode: peer.mode
+                        }]
+                    };
+                });
+            });
+        });
+        this.socket.on('introduction', (peer) => {
+            if (peer.room != this.room) throw new Error('I joined the wrong room!');
+
+            this.setState(state => {
+                return {
+                    peers: [...state.peers, {
                         socketId: peer.socketId,
                         content: peer.content,
                         mode: peer.mode
                     }]
+                };
+            });
+        });
+        this.socket.on('editor-update', (data) => {
+            this.setState(state => {
+                const updatedPeers = state.peers.map(p => {
+                    return p.socketId === data.socketId ? { ...p, content: data.content } : p;
                 });
+                return {
+                    peers: updatedPeers
+                };
             });
         });
-        this.socket.on('roomie-introduce', (peer) => {
-            if (peer.roomName != this.room) throw new Error('I joined the wrong room!');
-            this.setState({
-                peers: [...this.state.peers, {
-                    socketId: peer.socketId,
-                    content: peer.content,
-                    mode: peer.mode
-
-                }]
-            });
-        });
-        this.socket.on('roomie-editor', (data) => {
-            const updatedPeers = this.state.peers.map(p => {
-                return p.socketId === data.socketId ? { ...p, content: data.content } : p;
-            })
-            this.setState({
-                peers: updatedPeers
-            });
-        });
-        this.socket.on('roomie-leave', (data) => {
+        this.socket.on('leave-room', (data) => {
             this.setState(state => {
                 const updatedPeers = state.peers.filter(p => p.socketId !== data.socketId);
                 return {
@@ -95,8 +100,8 @@ class Main extends Component {
                 <SplitPane split="vertical" defaultSize="50%" >
                     <Editor {...me} onChange={this.myEditorChange} />
                     {peers.length
-                        ? peers.map(p => <Display key={p.socketId} {...p} />)
-                        : <Display initContent="Nobody here..." />
+                        ? peers.map(p => <Editor {...p} key={p.socketId} readOnly="nocursor" />)
+                        : <Editor content="Nobody here..." readOnly="nocursor" />
                     }
                     {/* Bug - Only one peer display appears */}
                 </SplitPane>

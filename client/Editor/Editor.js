@@ -9,6 +9,7 @@ import './Editor.css';
 const Editor = props => {
     const cmOptions = {
         mode: props.mode,
+        readOnly: props.readOnly,
         lineNumbers: true
     };
 
