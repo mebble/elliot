@@ -34,8 +34,8 @@ class State {
             roomies: roomies ? roomies.filter(s => s.id !== socket.id).map(s => s.id) : []  // could use to verify if all roomies have introduced themselves
         });
         socket.to(socket.roomName)
-            .emit('roomie-join', {
-                message: 'New roomie!',
+            .emit('join-room', {
+                message: 'New peer!',
                 socketId: socket.id,
                 roomName: data.roomName,
                 content: data.content,
@@ -45,7 +45,7 @@ class State {
 
     introduction(socket, data, ack) {
         socket.to(data.socketId)
-            .emit('roomie-introduce', {
+            .emit('introduction', {
                 socketId: socket.id,
                 roomName: data.roomName,
                 content: data.content,
@@ -58,7 +58,7 @@ class State {
 
     editorUpdate(socket, data, ack) {
         socket.to(socket.roomName)
-            .emit('roomie-editor', {
+            .emit('editor-update', {
                 content: data.content,
                 socketId: socket.id
             });
@@ -76,7 +76,7 @@ class State {
 
     _leaveRoom(socket) {
         socket.to(socket.roomName)
-            .emit('roomie-leave', {
+            .emit('leave-room', {
                 socketId: socket.id
             })
             .leave(socket.roomName);

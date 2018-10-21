@@ -21,7 +21,7 @@ class Main extends Component {
     }
 
     initSocketListeners() {
-        this.socket.on('roomie-join', (peer) => {
+        this.socket.on('join-room', (peer) => {
             if (peer.roomName != this.room) throw new Error('An outsider is here!');
 
             this.socket.emit('introduction', {
@@ -40,7 +40,7 @@ class Main extends Component {
                 });
             });
         });
-        this.socket.on('roomie-introduce', (peer) => {
+        this.socket.on('introduction', (peer) => {
             if (peer.roomName != this.room) throw new Error('I joined the wrong room!');
             this.setState({
                 peers: [...this.state.peers, {
@@ -51,7 +51,7 @@ class Main extends Component {
                 }]
             });
         });
-        this.socket.on('roomie-editor', (data) => {
+        this.socket.on('editor-update', (data) => {
             const updatedPeers = this.state.peers.map(p => {
                 return p.socketId === data.socketId ? { ...p, content: data.content } : p;
             })
@@ -59,7 +59,7 @@ class Main extends Component {
                 peers: updatedPeers
             });
         });
-        this.socket.on('roomie-leave', (data) => {
+        this.socket.on('leave-room', (data) => {
 
         });
     }
