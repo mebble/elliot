@@ -66,14 +66,20 @@ class Main extends Component {
 
     myEditorChange(newContent, changeObject) {
         // !! use the change object
-        this.socket.emit('editor-update', {
-            content: newContent
-        }, (err, res) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            console.log(res);
+        this.setState(state => {
+            return {
+                me: { ...state.me, content: newContent }
+            };
+        }, () => {
+            this.socket.emit('editor-update', {
+                content: newContent
+            }, (err, res) => {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log(res);
+            });
         });
     }
 
@@ -82,7 +88,7 @@ class Main extends Component {
         return (
             <div className="Main">
                 <SplitPane split="vertical" defaultSize="50%" >
-                    <Editor content={me.content} onChange={this.myEditorChange} />
+                    <Editor {...me} onChange={this.myEditorChange} />
                     {peers.length
                         ? peers.map(p => <Display key={p.socketId} {...p} />)
                         : <Display initContent="Nobody here..." />
